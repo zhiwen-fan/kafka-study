@@ -1,5 +1,6 @@
 kafka学习资料
 
+1.kafka设计解析
 http://www.jasongj.com/2015/03/10/KafkaColumn1/
-
+2.kafka教程
 http://orchome.com/5
