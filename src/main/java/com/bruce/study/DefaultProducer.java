@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
@@ -16,11 +17,11 @@ public class DefaultProducer {
 
     DefaultProducer() {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092,localhost:9093,localhost:9094");
+        props.put("bootstrap.servers", "localhost:9095");
         props.put("acks", "all");
         props.put("retries", 0);
         props.put("batch.size", 16384);
-        props.put("linger.ms", 0);
+        props.put("linger.ms", 1);
         props.put("buffer.memory", 33554432);
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -31,7 +32,14 @@ public class DefaultProducer {
 
     public void sendMessage(String topic,String msg) {
         ProducerRecord<String,String> record = new ProducerRecord<String, String>(topic,msg,msg);
-        kafkaProducer.send(record);
-
+        Future<RecordMetadata> futureResult = kafkaProducer.send(record);
+        try {
+            RecordMetadata recordMetadata = futureResult.get();
+            System.out.println("offset:" + recordMetadata.offset());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 }
